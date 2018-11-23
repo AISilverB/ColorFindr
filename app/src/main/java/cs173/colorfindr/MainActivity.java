@@ -11,13 +11,14 @@ import android.widget.RelativeLayout;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Button playGame;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+    }
 
-        playGame = (Button) findViewById(R.id.playbutton);
-
+    public void playGame(View view){
+        Intent intent = new Intent(MainActivity.this, GameActivity.class);
+        startActivity(intent);
     }
 }

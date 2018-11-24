@@ -3,45 +3,80 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#ffffff"
     tools:context=".GameActivity">
 
-    <!-- The primary full-screen view. This can be replaced with whatever view
-         is needed to present your content, e.g. VideoView, SurfaceView,
-         TextureView, etc. -->
 
-    <!-- This FrameLayout insets its children based on system windows using
-         android:fitsSystemWindows. -->
-
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
+    <TableLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/textView2"
-        android:layout_alignParentStart="true"
-        android:layout_marginStart="19dp"
-        android:text="@string/score"
-        android:textSize="24sp" />
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginTop="50dp">
 
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginStart="130dp"
-        android:layout_marginTop="46dp"
-        android:text="@string/lives"
-        android:textSize="24sp" />
 
-    <TextView
-        android:id="@+id/textView3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginStart="237dp"
-        android:layout_marginTop="45dp"
-        android:text="@string/high_score"
-        android:textSize="24sp" />
+        <TableRow>
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="10dp"
+            android:paddingStart="20dp"
+            android:paddingEnd="0dp"
+            android:textSize="25sp"
+            android:text="@string/score"
+            android:layout_column="1"/>
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="10dp"
+            android:paddingStart="45dp"
+            android:paddingEnd="0dp"
+            android:textSize="25sp"
+            android:text="@string/lives"
+            android:layout_column="2"/>
+
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="10dp"
+            android:paddingStart="45dp"
+            android:paddingEnd="0dp"
+            android:textSize="25sp"
+            android:text="@string/high_score"
+            android:layout_column="2"/>
+        </TableRow>
+        <TableRow>
+            <TextView
+                android:id="@+id/curr_score"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="25sp"
+                android:text="@string/curr_score"
+                android:layout_column="1"
+                android:layout_gravity="end"/>
+
+            <TextView
+                android:id="@+id/curr_lives"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="25sp"
+                android:text="@string/curr_lives"
+                android:layout_column="2"
+                android:layout_gravity="end"/>
+
+            <TextView
+                android:id="@+id/curr_high_score"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_column="2"
+                android:layout_gravity="end"
+                android:text="@string/curr_high_score"
+                android:textSize="25sp" />
+        </TableRow>
+    </TableLayout>
+
+
 </RelativeLayout>

@@ -9,5 +9,7 @@
     <string name="score">Score</string>
     <string name="lives">Lives</string>
     <string name="high_score">High Score</string>
-
+    <string name="curr_score">00000</string>
+    <string name="curr_lives">3</string>
+    <string name="curr_high_score">00000</string>
 </resources>

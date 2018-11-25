@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -7,6 +8,7 @@
 
 
     <TableLayout
+        android:id="@+id/table"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
@@ -26,18 +28,18 @@
             android:text="@string/score"
             android:layout_column="1"/>
 
-        <TextView
-            android:id="@+id/textView2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingBottom="10dp"
-            android:paddingStart="45dp"
-            android:paddingEnd="0dp"
-            android:textSize="25sp"
-            android:text="@string/lives"
-            android:layout_column="2"/>
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_column="2"
+                android:paddingStart="45dp"
+                android:paddingEnd="0dp"
+                android:paddingBottom="10dp"
+                android:text="@string/lives"
+                android:textSize="25sp" />
 
-        <TextView
+            <TextView
             android:id="@+id/textView3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -76,7 +78,23 @@
                 android:text="@string/curr_high_score"
                 android:textSize="25sp" />
         </TableRow>
+        <TableRow>
+            <TextureView
+                android:id="@+id/textureView"
+                android:layout_height="370dp"
+                android:layout_marginTop="15dp"
+                android:layout_span="4" />
+
+        </TableRow>
     </TableLayout>
 
+    <ImageButton
+        android:id="@+id/btnCapture"
+        android:layout_width="68dp"
+        android:layout_height="56dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/btncamera" />
 
 </RelativeLayout>

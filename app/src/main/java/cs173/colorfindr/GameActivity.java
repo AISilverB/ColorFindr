@@ -5,8 +5,13 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.ImageFormat;
 import android.graphics.SurfaceTexture;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.ShapeDrawable;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraCharacteristics;
@@ -23,6 +28,7 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -32,8 +38,12 @@ import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import org.w3c.dom.Text;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -53,6 +63,9 @@ public class GameActivity extends AppCompatActivity {
     private ImageButton btnCapture;
     private TextureView textureView;
     private int intArray[];
+    private int UnlockedColors[];
+    private String ColorList[];
+    private int currctr;
     //Check state orientation of output image
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
     static{
@@ -100,6 +113,8 @@ public class GameActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
+        retrieveColorList();
+        changeColor(currctr);
 
         textureView = (TextureView)findViewById(R.id.textureView);
         //From Java 1.4 , you can use keyword 'assert' to check expression true or false
@@ -110,10 +125,17 @@ public class GameActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 takePicture();
+                currctr++;
+                changeColor(currctr);
             }
         });
     }
 
+    private void retrieveColorList(){
+       ColorList = new String[127];
+       ColorList = getResources().getStringArray(R.array.colorlist);
+       currctr = 0;
+    }
     private void takePicture() {
         if(cameraDevice == null)
             return;
@@ -146,7 +168,7 @@ public class GameActivity extends AppCompatActivity {
             int rotation = getWindowManager().getDefaultDisplay().getRotation();
             captureBuilder.set(CaptureRequest.JPEG_ORIENTATION,ORIENTATIONS.get(rotation));
 
-            file = new File(Environment.getExternalStorageDirectory()+"/"+UUID.randomUUID().toString()+".jpg");
+            // file = new File(Environment.getExternalStorageDirectory()+"/"+UUID.randomUUID().toString()+".jpg");
             file = new File(Environment.getExternalStorageDirectory()+"/img/"+Calendar.getInstance().getTime().toString()+".jpg");
 
             ImageReader.OnImageAvailableListener readerListener = new ImageReader.OnImageAvailableListener() {
@@ -163,6 +185,7 @@ public class GameActivity extends AppCompatActivity {
                         intArray = new int[bmp.getWidth() * bmp.getHeight()];
                         bmp.getPixels(intArray, 0, bmp.getWidth(), 0, 0, bmp.getWidth(), bmp.getHeight());
 
+                        imageAnswer(intArray);
                         // NOT TO SAVE THE FILE
                         save(bytes);
                     }
@@ -220,6 +243,23 @@ public class GameActivity extends AppCompatActivity {
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
+    }
+
+    private void changeColor(int currctr) {
+        String colval = ColorList[currctr].replaceAll("[^A-Za-z0-9]", "");
+        EditText edit = (EditText) findViewById(R.id.curr_color_disp);
+        GradientDrawable gradientDrawable = (GradientDrawable) edit.getBackground().mutate();
+        Log.d(TAG, colval);
+
+        int objid = this.getResources().getIdentifier(colval, "color", this.getPackageName());
+        gradientDrawable.setColor(ContextCompat.getColor(this, objid));
+
+        TextView boxtext = (TextView) findViewById(R.id.curr_color_name);
+        boxtext.setText(ColorList[currctr]);
+    }
+
+    private void imageAnswer(int[] intArray) {
+        Log.d(TAG, "sakana = fish");
     }
 
     private void createCameraPreview() {

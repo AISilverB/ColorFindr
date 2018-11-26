@@ -13,4 +13,134 @@
     <string name="curr_lives">3</string>
     <string name="curr_high_score">00000</string>
     <string name="curr_color">blue</string>
+
+    <string-array name="colorlist">
+        <item>Midnight Blue</item>
+        <item>Azure</item>
+        <item>Mariner</item>
+        <item>Smalt</item>
+        <item>Navy Blue</item>
+        <item>Dark Blue</item>
+        <item>Navy Blue 2</item>
+        <item>Blue Stone</item>
+        <item>Bahama Blue</item>
+        <item>Pacific Blue</item>
+        <item>Science Blue</item>
+        <item>International Klein Blue</item>
+        <item>Blue</item>
+        <item>Blue 2</item>
+        <item>Sapphire</item>
+        <item>Patina</item>
+        <item>Persian Green</item>
+        <item>Turquoise</item>
+        <item>Cyan / Aqua</item>
+        <item>Azure Radiance</item>
+        <item>Blue Ribbon</item>
+        <item>Dodger Blue</item>
+        <item>Governor Bay</item>
+        <item>Kimberly</item>
+        <item>Sea Green</item>
+        <item>Caribbean Green</item>
+        <item>Bright Turquoise</item>
+        <item>Cyan / Aqua 2</item>
+        <item>Dodger Blue 2</item>
+        <item>Dodger Blue 3</item>
+        <item>Malibu</item>
+        <item>Cornflower Blue</item>
+        <item>Electric Violet 1</item>
+        <item>Purple</item>
+        <item>Apple 2</item>
+        <item>Jade</item>
+        <item>Spring Green</item>
+        <item>Aquamarine</item>
+        <item>Aquamarine 2</item>
+        <item>Malibu2</item>
+        <item>Anakiwa</item>
+        <item>Melrose</item>
+        <item>Heliotrope</item>
+        <item>Electric Violet 2</item>
+        <item>Electric Violet 3</item>
+        <item>Camarone</item>
+        <item>Abbey</item>
+        <item>Green</item>
+        <item>Screamin\' Green 3</item>
+        <item>Aquamarine 3</item>
+        <item>Onahau</item>
+        <item>Periwinkle</item>
+        <item>Mauve</item>
+        <item>Heliotrope 3</item>
+        <item>Heliotrope 2</item>
+        <item>Electric Violet 4</item>
+        <item>Electric Violet 5</item>
+        <item>Deep Fir</item>
+        <item>Azure Radiance 2</item>
+        <item>Apple</item>
+        <item>Screamin\' Green</item>
+        <item>Mint Green</item>
+        <item>Snowy Mint</item>
+        <item>White</item>
+        <item>Pink Lace</item>
+        <item>Lavender Rose</item>
+        <item>Pink Flamingo</item>
+        <item>Magenta / Fuchsia</item>
+        <item>Purple Pizzazz</item>
+        <item>Pompadour</item>
+        <item>Verdun Green</item>
+        <item>Japanese Laurel</item>
+        <item>Bright Green</item>
+        <item>Screamin\' Green 2</item>
+        <item>Reef</item>
+        <item>Cream</item>
+        <item>Your Pink</item>
+        <item>Carnation Pink</item>
+        <item>Hot Pink</item>
+        <item>Razzle Dazzle Rose</item>
+        <item>Hollywood Cerise</item>
+        <item>Plum</item>
+        <item>Madras</item>
+        <item>Limeade</item>
+        <item>Green Yellow 2</item>
+        <item>Canary</item>
+        <item>Pale Canary</item>
+        <item>Peach Orange</item>
+        <item>Mona Lisa</item>
+        <item>Hot Pink 2</item>
+        <item>Wild Strawberry</item>
+        <item>Medium Red Violet</item>
+        <item>Flirt</item>
+        <item>Costa Del Sol</item>
+        <item>Pistachio</item>
+        <item>Green Yellow</item>
+        <item>Laser Lemon</item>
+        <item>Golden Tainoi</item>
+        <item>Atomic Tangerine</item>
+        <item>Bittersweet</item>
+        <item>Rose</item>
+        <item>Hopbush</item>
+        <item>Rouge</item>
+        <item>Avocado</item>
+        <item>Rio Grande</item>
+        <item>Yellow</item>
+        <item>Supernova</item>
+        <item>Neon Carrot</item>
+        <item>Blaze Orange</item>
+        <item>Sunset Orange</item>
+        <item>Lipstick</item>
+        <item>Tyrian Purple</item>
+        <item>Potters Clay</item>
+        <item>Buddha Gold</item>
+        <item>Orange Peel</item>
+        <item>Tenn</item>
+        <item>Scarlet</item>
+        <item>Red</item>
+        <item>Guardsman Red</item>
+        <item>Paprika</item>
+        <item>Nutmeg Wood Finish</item>
+        <item>Chelsea Gem</item>
+        <item>Grenadier</item>
+        <item>Oregon</item>
+        <item>Red Berry</item>
+        <item>Maroon</item>
+        <item>Stiletto</item>
+    </string-array>
 </resources>

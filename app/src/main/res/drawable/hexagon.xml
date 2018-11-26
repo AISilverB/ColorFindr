@@ -1,16 +1,7 @@
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
 
-                <shape xmlns:android="http://schemas.android.com/apk/res/android"
-                    android:id="@+id/curr_color_disp"
-                    android:layout_width="50dp"
-                    android:layout_gravity="bottom|left"
-                    android:layout_height="50dp"
-                    android:layout_marginStart="80sp"
-                    android:layout_marginBottom="50dp">
+    <stroke
+        android:width="5dp"
+        android:color="@color/bg" />
 
-                    <solid android:color="#E84F3D" />
-
-                    <stroke
-                        android:width="15dp"
-                        android:color="#BEBEBE" />
-
-                </shape>
+</shape>

@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="@drawable/btncamerapressed" android:state_pressed="true" />
-    <item android:layout_height="match_parent" android:drawable="@color/gold" android:state_focused="true" />
-    <item android:drawable="@drawable/btncamera1" />
+    <item android:state_pressed="true">
+        <shape android:shape="oval">
+            <solid android:color="@color/fg"/>
+             <stroke android:color="@color/bg" android:width="3px"/>
+        </shape>
+    </item>
+    <item android:state_pressed="false">
+        <shape android:shape="oval">
+            <!-- <solid android:color="#f8b62f"/> -->
+	        <solid android:color="@color/fg" android:width="3px"/>
+        </shape>
+        <!-- <solid android:color="@android:color/transparent"/> -->
+    </item>
 </selector>

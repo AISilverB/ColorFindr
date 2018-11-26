@@ -8,4 +8,10 @@
     <color name="blue">#0066cc</color>
     <color name="gold">#e6b121</color>
     <color name="grey">#cccccc</color>
+
+    <!--yellowish and white theme <bumble> -->
+    <color name="fg">#f8b62f</color>
+    <color name="bg">#ffffff</color>
+
+
 </resources>

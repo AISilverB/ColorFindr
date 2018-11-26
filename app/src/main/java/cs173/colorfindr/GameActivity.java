@@ -3,6 +3,8 @@ package cs173.colorfindr;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
@@ -23,6 +25,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.Size;
 import android.util.SparseIntArray;
 import android.view.Surface;
@@ -40,14 +43,16 @@ import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
 import java.util.UUID;
 
 public class GameActivity extends AppCompatActivity {
 
+    private String TAG = "GameActivity";
     private ImageButton btnCapture;
     private TextureView textureView;
-
+    private int intArray[];
     //Check state orientation of output image
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
     static{
@@ -142,6 +147,8 @@ public class GameActivity extends AppCompatActivity {
             captureBuilder.set(CaptureRequest.JPEG_ORIENTATION,ORIENTATIONS.get(rotation));
 
             file = new File(Environment.getExternalStorageDirectory()+"/"+UUID.randomUUID().toString()+".jpg");
+            file = new File(Environment.getExternalStorageDirectory()+"/img/"+Calendar.getInstance().getTime().toString()+".jpg");
+
             ImageReader.OnImageAvailableListener readerListener = new ImageReader.OnImageAvailableListener() {
                 @Override
                 public void onImageAvailable(ImageReader imageReader) {
@@ -151,29 +158,31 @@ public class GameActivity extends AppCompatActivity {
                         ByteBuffer buffer = image.getPlanes()[0].getBuffer();
                         byte[] bytes = new byte[buffer.capacity()];
                         buffer.get(bytes);
-                        save(bytes);
+                        Bitmap bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, null);
+                        //Initialize the intArray with the same size as the number of pixels on the image
+                        intArray = new int[bmp.getWidth() * bmp.getHeight()];
+                        bmp.getPixels(intArray, 0, bmp.getWidth(), 0, 0, bmp.getWidth(), bmp.getHeight());
 
+                        // NOT TO SAVE THE FILE
+                        save(bytes);
                     }
-                    catch (FileNotFoundException e)
-                    {
+                    catch (Exception e) {
                         e.printStackTrace();
-                    }
-                    catch (IOException e)
-                    {
-                        e.printStackTrace();
-                    }
-                    finally {
+                    } finally {
                         {
                             if(image != null)
                                 image.close();
                         }
                     }
                 }
+
+//                 NOT TO SAVE THE FILE
                 private void save(byte[] bytes) throws IOException {
                     OutputStream outputStream = null;
                     try{
                         outputStream = new FileOutputStream(file);
                         outputStream.write(bytes);
+                        Log.d(TAG, "file saved");
                     }finally {
                         if(outputStream != null)
                             outputStream.close();

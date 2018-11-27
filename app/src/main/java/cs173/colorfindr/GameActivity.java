@@ -172,7 +172,6 @@ public class GameActivity extends AppCompatActivity {
 
             //Check orientation base on device
             int rotation = getWindowManager().getDefaultDisplay().getRotation();
-
             captureBuilder.set(CaptureRequest.JPEG_ORIENTATION,ORIENTATIONS.get(rotation));
 
             // file = new File(Environment.getExternalStorageDirectory()+"/"+UUID.randomUUID().toString()+".jpg");
@@ -184,19 +183,21 @@ public class GameActivity extends AppCompatActivity {
                     Image image = null;
                     try{
                         image = reader.acquireLatestImage();
+
                         ByteBuffer buffer = image.getPlanes()[0].getBuffer();
                         byte[] bytes = new byte[buffer.capacity()];
                         buffer.get(bytes);
 
-                        Bitmap bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, null);
 
-                        intArray = new int[bmp.getWidth() * bmp.getHeight()];
-                        int[] intArray2 = new int[50];
-                        //bmp.getPixels(intArray, 0, bmp.getWidth(), 0, 0, 50, 50);
-                        Log.d(TAG, Integer.toString(bmp.getWidth())+ " w-h " + Integer.toString(bmp.getHeight()));
+                        Bitmap bm = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, null);
+                        Matrix m = new Matrix();
+                        m.postRotate(90);
+                        Bitmap bmp = Bitmap.createBitmap(bm, 0, 0, bm.getWidth(), bm.getHeight(), m, true);
+
+//                        Log.d(TAG, Integer.toString(bmp.getWidth())+ " w-h " + Integer.toString(bmp.getHeight()));
 
                         bmp = imageAnswer(bmp);
-
+//
                         // bitmap to save
                         ByteArrayOutputStream bos = new ByteArrayOutputStream();
                         bmp.compress(Bitmap.CompressFormat.JPEG, 100, bos);
@@ -286,8 +287,8 @@ public class GameActivity extends AppCompatActivity {
         logme("texture w", imagex.getWidth());
         // CREATE A MATRIX FOR THE MANIPULATION
         Matrix matrix = new Matrix();
-        // RESIZE THE BIT MAP
-
+//    return imagea;
+//         RESIZE THE BIT MAP
 
         // Create a bitmap of the same size
         Bitmap pic = imagea;
@@ -353,12 +354,6 @@ public class GameActivity extends AppCompatActivity {
 //        offsety = (int) ((imagea.getScaledHeight(getResources().getDisplayMetrics()) / 2));
 //        Log.d(TAG, Integer.toString(offsetx)+"-"+ Integer.toString(offsety)+"  "+ Float.toString(offsetx+ boxtext.getHeight()*scalex) +"-"+  Float.toString(offsety + boxtext.getWidth()*scaley));
 
-
-        matrix = new Matrix();
-        matrix.postRotate(90);
-        Bitmap scaledBitmap = Bitmap.createScaledBitmap(imagea, imagea.getWidth(), imagea.getHeight(), true);
-        Bitmap rotatedBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
-        imagea = rotatedBitmap;
 
         logme("OFFSETX: ", offsetx);
         logme("OFFSETY: ", offsety);

@@ -275,98 +275,35 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private Bitmap imageAnswer(Bitmap imagea) {
-        Log.d(TAG, "sakana = fish");
-        Log.d(TAG, Integer.toString(imagea.getHeight()) + " h-w" + Integer.toString(imagea.getWidth()));
-
-
         int[] imgloc = new int[2];
         TextureView imagex = (TextureView) findViewById(R.id.textureView);
         imagex.getLocationOnScreen(imgloc);
-
-        logme("texture h", imagex.getHeight());
-        logme("texture w", imagex.getWidth());
-        // CREATE A MATRIX FOR THE MANIPULATION
-        Matrix matrix = new Matrix();
-//    return imagea;
-//         RESIZE THE BIT MAP
-
-        // Create a bitmap of the same size
-        Bitmap pic = imagea;
-        Bitmap newBmp = Bitmap.createBitmap(pic.getWidth(), pic.getHeight(), Bitmap.Config.ARGB_8888);
-        // Create a canvas  for new bitmap
-        Canvas c = new Canvas(newBmp);
-        // Draw your old bitmap on it.
-        c.drawBitmap(pic, 0, 0, new Paint());
-        imagea = newBmp;
-
-
-        float scaleWidth = imagex.getWidth() / imagea.getWidth();
-        float scaleHeight = imagex.getHeight() / imagea.getHeight();
-        matrix.postScale(scaleWidth, scaleHeight);
-        // "RECREATE" THE NEW BITMAP
-        imagea  = Bitmap.createScaledBitmap(imagea, imagex.getWidth(), imagex.getHeight(), false);
-//        Bitmap resizedBitmap = Bitmap.createBitmap(
-//                imagea, 0, 0, imagex.getWidth(), imagex.getHeight(), matrix, false);
-//        imagea.recycle();
-//        imagea = resizedBitmap;
-//        Log.d(TAG, Integer.toString(resizedBitmap.getHeight()) + " h-w" + Integer.toString(resizedBitmap.getWidth()));
 
         int[] boxloc = new int[2];
         TextView boxtext = (TextView) findViewById(R.id.box_answer);
         boxtext.getLocationOnScreen(boxloc);
 
-        Log.d(TAG, Integer.toString(imagea.getHeight()) + " h-w" + Integer.toString(imagea.getWidth()));
-
-
-//        float scalex = imagea.getScaledWidth(getResources().getDisplayMetrics())/imagex.getWidth();
-//        float scaley = imagea.getScaledHeight(getResources().getDisplayMetrics())/imagex.getHeight();
-
-
-        int scale = (imagea.getScaledHeight(getResources().getDisplayMetrics()) * imagea.getScaledWidth(getResources().getDisplayMetrics()))
-                / (imagex.getHeight() * imagex.getWidth());
-        logmef("scale", scale);
-//        logmef("scaley", scaley);
-        logmef("scaledDensity", getResources().getDisplayMetrics().scaledDensity);
-        logmef("densityDpi", getResources().getDisplayMetrics().densityDpi);
-        logmef("density", getResources().getDisplayMetrics().density);
-        logmef("xdpi", getResources().getDisplayMetrics().xdpi);
-        logmef("ydpi", getResources().getDisplayMetrics().ydpi);
-        logme("boxsize h", boxtext.getHeight());
-        logme("texture h", imagex.getHeight());
-        logme("texture w", imagex.getWidth());
-        logme("textloc x", imgloc[0]);
-        logme("textloc y", imgloc[1]);
-        logme("boxloc x", boxloc[0]);
-        logme("boxloc y", boxloc[1]);
-//        int offsetx = (int) ((boxloc[0]-imgloc[0])*scalex);
-//        int offsety = (int) ((boxloc[1]-imgloc[1])*scaley);
-
-        scale = (int) Math.sqrt(scale);
-        scale = 1;
-//        int offsetx = (int) ((imagea.getScaledWidth(getResources().getDisplayMetrics()) / 2) -
-//                ((boxtext.getWidth() / 2) * scale));
-//        int offsety = (int) ((imagea.getScaledHeight(getResources().getDisplayMetrics()) / 2) -
-//                        ((boxtext.getHeight() / 2) * scale));
         int offsetx = boxloc[0] - imgloc[0];
         int offsety = boxloc[1] - imgloc[1];
 
-                //        offsetx = (int) ((imagea.getScaledWidth(getResources().getDisplayMetrics()) / 2));
-//        offsety = (int) ((imagea.getScaledHeight(getResources().getDisplayMetrics()) / 2));
-//        Log.d(TAG, Integer.toString(offsetx)+"-"+ Integer.toString(offsety)+"  "+ Float.toString(offsetx+ boxtext.getHeight()*scalex) +"-"+  Float.toString(offsety + boxtext.getWidth()*scaley));
 
 
-        logme("OFFSETX: ", offsetx);
-        logme("OFFSETY: ", offsety);
+        String black = "#000000";
+        int fi = Integer.parseInt(black.substring(1,2), 16);
+        int se = Integer.parseInt(black.substring(3,4), 16);
+        int th = Integer.parseInt(black.substring(5, 6), 16);
+
         for (int y = 0; y < boxtext.getHeight(); y++) {
             for (int x = 0; x < boxtext.getWidth(); x++) {
                 int pv = imagea.getPixel(x + offsetx, y + offsety);
-                short red = (short) ((pv >> 16) & 0xFF);
-                short green = (short) ((pv >> 8) & 0xFF);
-                short blue = (short) ((pv >> 0) & 0xFF);
                 imagea.setPixel(x+offsetx, y+offsety, Color.RED);
-                Log.d(TAG, Integer.toString(offsetx+x) + "-" + Integer.toString(offsety+y)+ " = "
-                        + Integer.toString(red)+Integer.toString(green)+Integer.toString(blue));
-//      s          Log.d(TAG, Integer.toString(offsetx+x) + "-" + Integer.toString(offsety+y)+ " = "+Integer.toString(pixelvalues[y][x]));
+
+
+                
+                Log.d(TAG, Integer.toString(offsetx+x) + "-" + Integer.toString(offsety+y)+ " = " + Integer.toString(pv));
+
+
+
             }
         }
 

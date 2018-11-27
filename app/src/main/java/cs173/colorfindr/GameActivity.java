@@ -65,7 +65,6 @@ public class GameActivity extends AppCompatActivity {
     private Thread runnable;
     private String TAG = "GameActivity";
     private TextureView textureView;
-    private String UnlockedColors[];
     private String ColorList[];
     private int currctr;
     private String currcolor;
@@ -182,7 +181,7 @@ public class GameActivity extends AppCompatActivity {
        ColorList = new String[127];
        ColorList = getResources().getStringArray(R.array.colorlist);
        currctr = 0;
-       UnlockedColors = new String[127];
+//       UnlockedColors = new String[127];
     }
 
     private void takePicture() {
@@ -322,23 +321,18 @@ public class GameActivity extends AppCompatActivity {
 
         int randomColor = rand.nextInt(ColorList.length);
 
-        while(!Arrays.asList(UnlockedColors).contains(UnlockedColors[randomColor])){
-            randomColor = rand.nextInt(ColorList.length);
-        }
         currctr++;
-        UnlockedColors[currctr] = ColorList[randomColor];
-
         EditText edit = findViewById(R.id.curr_color_disp);
         GradientDrawable gradientDrawable = (GradientDrawable) edit.getBackground().mutate();
 
 
-        String colval = UnlockedColors[currctr].replaceAll("[^A-Za-z0-9]", "");
+        String colval = ColorList[randomColor].replaceAll("[^A-Za-z0-9]", "");
         Log.d(TAG, colval);
         int objid = this.getResources().getIdentifier(colval, "color", this.getPackageName());
         gradientDrawable.setColor(ContextCompat.getColor(this, objid));
 
         TextView boxtext = findViewById(R.id.curr_color_name);
-        boxtext.setText(UnlockedColors[currctr]);
+        boxtext.setText(ColorList[randomColor]);
         currcolor = getResources().getString(objid).substring(2);
 
         TextView scoretext = findViewById(R.id.curr_score);

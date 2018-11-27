@@ -186,100 +186,102 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void takePicture() {
-        if(cameraDevice == null)
-            return;
-        CameraManager manager = (CameraManager)getSystemService(Context.CAMERA_SERVICE);
-        try{
-            CameraCharacteristics characteristics = null;
-            if (manager != null) {
-                characteristics = manager.getCameraCharacteristics(cameraDevice.getId());
-            }
-            Size[] jpegSizes = null;
-            if(characteristics != null)
-                jpegSizes = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)
-                        .getOutputSizes(ImageFormat.JPEG);
+        try {
+            if (cameraDevice == null)
+                return;
+            CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
+            try {
+                CameraCharacteristics characteristics = null;
+                if (manager != null) {
+                    characteristics = manager.getCameraCharacteristics(cameraDevice.getId());
+                }
+                Size[] jpegSizes = null;
+                if (characteristics != null)
+                    jpegSizes = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)
+                            .getOutputSizes(ImageFormat.JPEG);
 
-            TextureView imagex = findViewById(R.id.textureView);
+                TextureView imagex = findViewById(R.id.textureView);
 
-            //Capture image with custom size
-            Log.d(TAG, "BUHAY: " + runnable.isAlive());
-            logme("textw", imagex.getWidth());
-            logme("texth", imagex.getHeight());
-            int width = imagex.getWidth();
-            int height = imagex.getHeight();
+                //Capture image with custom size
+                Log.d(TAG, "BUHAY: " + runnable.isAlive());
+                logme("textw", imagex.getWidth());
+                logme("texth", imagex.getHeight());
+                int width = imagex.getWidth();
+                int height = imagex.getHeight();
 
-            final ImageReader reader = ImageReader.newInstance(width,height,ImageFormat.JPEG,1);
-            List<Surface> outputSurface = new ArrayList<>(2);
-            outputSurface.add(reader.getSurface());
-            outputSurface.add(new Surface(textureView.getSurfaceTexture()));
+                final ImageReader reader = ImageReader.newInstance(width, height, ImageFormat.JPEG, 1);
+                List<Surface> outputSurface = new ArrayList<>(2);
+                outputSurface.add(reader.getSurface());
+                outputSurface.add(new Surface(textureView.getSurfaceTexture()));
 
-            final CaptureRequest.Builder captureBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
-            captureBuilder.addTarget(reader.getSurface());
-            captureBuilder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO);
+                final CaptureRequest.Builder captureBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
+                captureBuilder.addTarget(reader.getSurface());
+                captureBuilder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO);
 
-            //Check orientation base on device
-            int rotation = getWindowManager().getDefaultDisplay().getRotation();
-            captureBuilder.set(CaptureRequest.JPEG_ORIENTATION,ORIENTATIONS.get(rotation));
+                //Check orientation base on device
+                int rotation = getWindowManager().getDefaultDisplay().getRotation();
+                captureBuilder.set(CaptureRequest.JPEG_ORIENTATION, ORIENTATIONS.get(rotation));
 
-            ImageReader.OnImageAvailableListener readerListener = new ImageReader.OnImageAvailableListener() {
-                @Override
-                public void onImageAvailable(ImageReader imageReader) {
-                    Image image = null;
-                    try{
-                        image = reader.acquireLatestImage();
+                ImageReader.OnImageAvailableListener readerListener = new ImageReader.OnImageAvailableListener() {
+                    @Override
+                    public void onImageAvailable(ImageReader imageReader) {
+                        Image image = null;
+                        try {
+                            image = reader.acquireLatestImage();
 
-                        ByteBuffer buffer = image.getPlanes()[0].getBuffer();
-                        byte[] bytes = new byte[buffer.capacity()];
-                        buffer.get(bytes);
+                            ByteBuffer buffer = image.getPlanes()[0].getBuffer();
+                            byte[] bytes = new byte[buffer.capacity()];
+                            buffer.get(bytes);
 
-                        Bitmap bm = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, null);
-                        Matrix m = new Matrix();
-                        m.postRotate(90);
-                        Bitmap bmp = Bitmap.createBitmap(bm, 0, 0, bm.getWidth(), bm.getHeight(), m, true);
-                        imageAnswer(bmp);
+                            Bitmap bm = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, null);
+                            Matrix m = new Matrix();
+                            m.postRotate(90);
+                            Bitmap bmp = Bitmap.createBitmap(bm, 0, 0, bm.getWidth(), bm.getHeight(), m, true);
+                            imageAnswer(bmp);
 
-                    }
-                    catch (Exception e) {
-                        e.printStackTrace();
-                    } finally {
-                        {
-                            if(image != null)
-                                image.close();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        } finally {
+                            {
+                                if (image != null)
+                                    image.close();
+                            }
                         }
                     }
-                }
-            };
+                };
 
-            reader.setOnImageAvailableListener(readerListener,mBackgroundHandler);
-            final CameraCaptureSession.CaptureCallback captureListener = new CameraCaptureSession.CaptureCallback() {
-                @Override
-                public void onCaptureCompleted(@NonNull CameraCaptureSession session, @NonNull CaptureRequest request, @NonNull TotalCaptureResult result) {
-                    super.onCaptureCompleted(session, request, result);
-                    createCameraPreview();
-                }
-            };
-
-            cameraDevice.createCaptureSession(outputSurface, new CameraCaptureSession.StateCallback() {
-                @Override
-                public void onConfigured(@NonNull CameraCaptureSession cameraCaptureSession) {
-                    try{
-                        cameraCaptureSession.capture(captureBuilder.build(),captureListener,mBackgroundHandler);
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                reader.setOnImageAvailableListener(readerListener, mBackgroundHandler);
+                final CameraCaptureSession.CaptureCallback captureListener = new CameraCaptureSession.CaptureCallback() {
+                    @Override
+                    public void onCaptureCompleted(@NonNull CameraCaptureSession session, @NonNull CaptureRequest request, @NonNull TotalCaptureResult result) {
+                        super.onCaptureCompleted(session, request, result);
+                        createCameraPreview();
                     }
-                }
+                };
 
-                @Override
-                public void onConfigureFailed(@NonNull CameraCaptureSession cameraCaptureSession) {
+                cameraDevice.createCaptureSession(outputSurface, new CameraCaptureSession.StateCallback() {
+                    @Override
+                    public void onConfigured(@NonNull CameraCaptureSession cameraCaptureSession) {
+                        try {
+                            cameraCaptureSession.capture(captureBuilder.build(), captureListener, mBackgroundHandler);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
 
-                }
-            },mBackgroundHandler);
+                    @Override
+                    public void onConfigureFailed(@NonNull CameraCaptureSession cameraCaptureSession) {
+
+                    }
+                }, mBackgroundHandler);
 
 
-        } catch (CameraAccessException e) {
+            } catch (CameraAccessException e) {
+                e.printStackTrace();
+            }
+        } catch (Exception e){
             e.printStackTrace();
         }
-
 
     }
 

@@ -28,29 +28,32 @@
                 android:paddingEnd="0dp"
                 android:paddingBottom="10dp"
                 android:text="@string/score"
-                android:textSize="25sp" />
+                android:textSize="20sp"
+                android:textColor="@color/fg"/>
 
             <TextView
                 android:id="@+id/textView2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_column="2"
-                android:paddingStart="45dp"
-                android:paddingEnd="0dp"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
                 android:paddingBottom="10dp"
                 android:text="@string/lives"
-                android:textSize="25sp" />
+                android:textSize="20sp"
+                android:textColor="@color/fg"/>
 
             <TextView
                 android:id="@+id/textView3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_column="2"
-                android:paddingStart="45dp"
+                android:paddingStart="0dp"
                 android:paddingEnd="0dp"
                 android:paddingBottom="10dp"
                 android:text="@string/high_score"
-                android:textSize="25sp" />
+                android:textSize="20sp"
+                android:textColor="@color/fg"/>
         </TableRow>
 
         <TableRow>
@@ -62,16 +65,19 @@
                 android:layout_column="1"
                 android:layout_gravity="end"
                 android:text="@string/curr_score"
-                android:textSize="25sp" />
+                android:textSize="20sp" />
 
             <TextView
                 android:id="@+id/curr_lives"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_column="2"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:paddingBottom="10dp"
                 android:layout_gravity="end"
                 android:text="@string/curr_lives"
-                android:textSize="25sp" />
+                android:textSize="20sp" />
 
             <TextView
                 android:id="@+id/curr_high_score"
@@ -80,7 +86,7 @@
                 android:layout_column="2"
                 android:layout_gravity="end"
                 android:text="@string/curr_high_score"
-                android:textSize="25sp" />
+                android:textSize="20sp" />
         </TableRow>
 
         <TableRow>
@@ -97,7 +103,7 @@
                 <TextureView
                     android:id="@+id/textureView"
                     android:layout_width="match_parent"
-                    android:layout_height="408dp"
+                    android:layout_height="300dp"
                     android:layout_gravity="center"/>
 
 
@@ -107,28 +113,25 @@
                     android:layout_height="50dp"
                     android:layout_gravity="bottom|center"
                     android:layout_marginStart="50dp"
-                    android:layout_marginBottom="25dp"
+                    android:layout_marginBottom="35dp"
                     android:textColor="@color/bg"
-                    android:autoSizeMinTextSize="20sp"
-                    android:autoSizeMaxTextSize="30sp"
-                    android:textSize="35sp"
-                    android:maxLines="1"
-                    android:autoSizeTextType="uniform"/>
+                    android:textSize="20sp"
+                    android:maxLines="1"/>
 
                 <TextView
                     android:background="@drawable/boxanswer"
                     android:id="@+id/box_answer"
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
                     android:layout_gravity="center" />
 
                 <EditText
                     android:id="@+id/curr_color_disp"
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
                     android:layout_gravity="bottom|start"
-                    android:layout_marginStart="80sp"
-                    android:layout_marginBottom="20dp"
+                    android:layout_marginStart="40sp"
+                    android:layout_marginBottom="30dp"
                     android:background="@drawable/hexagon" />
 
             </FrameLayout>

@@ -1,6 +1,7 @@
 package cs173.colorfindr;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -72,6 +73,10 @@ public class GameActivity extends AppCompatActivity {
     private int UnlockedColors[];
     private String ColorList[];
     private int currctr;
+    private String currcolor;
+    private int currscore;
+    private int currlives;
+    private int currhighscore;
     //Check state orientation of output image
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
     static{
@@ -87,13 +92,14 @@ public class GameActivity extends AppCompatActivity {
     private CaptureRequest.Builder captureRequestBuilder;
     private Size imageDimension;
     private ImageReader imageReader;
-
+    private int level;
     //Save to FILE
     private File file;
     private static final int REQUEST_CAMERA_PERMISSION = 200;
     private boolean mFlashSupported;
     private Handler mBackgroundHandler;
     private HandlerThread mBackgroundThread;
+    private Boolean answer;
 
     CameraDevice.StateCallback stateCallback = new CameraDevice.StateCallback() {
         @Override
@@ -119,8 +125,7 @@ public class GameActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
-        retrieveColorList();
-        changeColor(currctr);
+        init();
 
         textureView = (TextureView)findViewById(R.id.textureView);
         //From Java 1.4 , you can use keyword 'assert' to check expression true or false
@@ -131,10 +136,18 @@ public class GameActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 takePicture();
-                currctr++;
-                changeColor(currctr);
             }
         });
+    }
+
+    private void init(){
+        level = 40;
+        currscore = 0;
+        currlives = 10;
+        currhighscore = 0;
+
+        retrieveColorList();
+        changeColor(currctr);
     }
 
     private void retrieveColorList(){
@@ -196,14 +209,14 @@ public class GameActivity extends AppCompatActivity {
 
 //                        Log.d(TAG, Integer.toString(bmp.getWidth())+ " w-h " + Integer.toString(bmp.getHeight()));
 
-                        bmp = imageAnswer(bmp);
+                        imageAnswer(bmp);
+                        ////
+//                        // bitmap to save
+//                        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+//                        bmp.compress(Bitmap.CompressFormat.JPEG, 100, bos);
+//                        bytes = bos.toByteArray();
 //
-                        // bitmap to save
-                        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                        bmp.compress(Bitmap.CompressFormat.JPEG, 100, bos);
-                        bytes = bos.toByteArray();
-
-                        save(bytes);
+//                        save(bytes);
                     }
                     catch (Exception e) {
                         e.printStackTrace();
@@ -234,7 +247,7 @@ public class GameActivity extends AppCompatActivity {
                 @Override
                 public void onCaptureCompleted(@NonNull CameraCaptureSession session, @NonNull CaptureRequest request, @NonNull TotalCaptureResult result) {
                     super.onCaptureCompleted(session, request, result);
-                    Toast.makeText(GameActivity.this, "Saved "+file, Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(GameActivity.this, "Saved "+file, Toast.LENGTH_SHORT).show();
                     createCameraPreview();
                 }
             };
@@ -259,8 +272,12 @@ public class GameActivity extends AppCompatActivity {
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
+
+        currctr++;
+        changeColor(currctr);
     }
 
+    @SuppressLint("ResourceType")
     private void changeColor(int currctr) {
         String colval = ColorList[currctr].replaceAll("[^A-Za-z0-9]", "");
         EditText edit = (EditText) findViewById(R.id.curr_color_disp);
@@ -272,9 +289,17 @@ public class GameActivity extends AppCompatActivity {
 
         TextView boxtext = (TextView) findViewById(R.id.curr_color_name);
         boxtext.setText(ColorList[currctr]);
+        currcolor = getResources().getString(objid).substring(2);
+
+        TextView scoretext = (TextView) findViewById(R.id.curr_score);
+        scoretext.setText(Integer.toString(currscore));
+        TextView livestext = (TextView) findViewById(R.id.curr_lives);
+        livestext.setText(Integer.toString(currlives));
+        TextView highscoretext = (TextView) findViewById(R.id.curr_high_score);
+        highscoretext.setText(Integer.toString(currhighscore));
     }
 
-    private Bitmap imageAnswer(Bitmap imagea) {
+    private void imageAnswer(Bitmap imagea) {
         int[] imgloc = new int[2];
         TextureView imagex = (TextureView) findViewById(R.id.textureView);
         imagex.getLocationOnScreen(imgloc);
@@ -286,28 +311,58 @@ public class GameActivity extends AppCompatActivity {
         int offsetx = boxloc[0] - imgloc[0];
         int offsety = boxloc[1] - imgloc[1];
 
+        int fi = Integer.parseInt(currcolor.substring(1,3), 16);
+        int se = Integer.parseInt(currcolor.substring(3,5), 16);
+        int th = Integer.parseInt(currcolor.substring(5, 7), 16);
 
 
-        String black = "#000000";
-        int fi = Integer.parseInt(black.substring(1,2), 16);
-        int se = Integer.parseInt(black.substring(3,4), 16);
-        int th = Integer.parseInt(black.substring(5, 6), 16);
-
+        int off = level;
         for (int y = 0; y < boxtext.getHeight(); y++) {
             for (int x = 0; x < boxtext.getWidth(); x++) {
                 int pv = imagea.getPixel(x + offsetx, y + offsety);
                 imagea.setPixel(x+offsetx, y+offsety, Color.RED);
 
 
-                
-                Log.d(TAG, Integer.toString(offsetx+x) + "-" + Integer.toString(offsety+y)+ " = " + Integer.toString(pv));
+
+                short red = (short) ((pv >> 16) & 0xFF);
+                short green = (short) ((pv >> 8) & 0xFF);
+                short blue = (short) ((pv >> 0) & 0xFF);
 
 
+                if ( ((fi - off < red) && (fi + off > red)) &&
+                        ((se - off < green) && (se + off > green)) &&
+                            ((th - off < blue) && (th + off > blue)) ){
 
+                    Log.d(TAG, "GACHA");
+
+                    Log.d(TAG, Integer.toString(offsetx+x) + "-" + Integer.toString(offsety+y)+ " = "
+                            + Integer.toString(fi)+Integer.toString(se)+Integer.toString(th) + " - "
+                            + Integer.toString(red)+Integer.toString(green)+Integer.toString(blue));
+                    updateStats(true);
+                    return;
+// return imagea;
+                }
+
+//                Log.d(TAG, Integer.toString(offsetx+x) + "-" + Integer.toString(offsety+y)
+//                        + currcolor.substring(1,2) + " = "
+//                        + Integer.toString(fi)+Integer.toString(se)+Integer.toString(th) + " - "
+//                        + Integer.toString(red)+Integer.toString(green)+Integer.toString(blue));
             }
         }
+        updateStats(false);
+    }
 
-        return imagea;
+    private void updateStats(boolean answer){
+        Toast.makeText(GameActivity.this,"Your answer is: " + answer, Toast.LENGTH_SHORT).show();
+
+        if (answer) {
+            currscore++;
+            if (currscore > currhighscore){
+                currhighscore = currscore;
+            }
+        } else {
+            currlives--;
+        }
     }
 
     private void logme(String y, int x){

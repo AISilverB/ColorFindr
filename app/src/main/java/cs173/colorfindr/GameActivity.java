@@ -2,7 +2,9 @@ package cs173.colorfindr;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -389,7 +391,10 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void updateStats(boolean answer){
-        Toast.makeText(GameActivity.this,"Your answer is: " + answer, Toast.LENGTH_SHORT).show();
+        if (answer)
+            Toast.makeText(GameActivity.this,"COLOR FOUND!", Toast.LENGTH_SHORT).show();
+        else
+            Toast.makeText(GameActivity.this,"Error 404: Color NOT FOUND!", Toast.LENGTH_SHORT).show();
 
         if (answer) {
             currscore++;
@@ -422,7 +427,20 @@ public class GameActivity extends AppCompatActivity {
         }catch (Exception e){
             e.printStackTrace();
         }
-        finish();
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("OUT OF LIVES!")
+                .setPositiveButton("OK", new DialogInterface.OnClickListener(){
+                    public void onClick(DialogInterface arg0, int arg1) {
+                        finish();
+                    }
+                })
+        .setNegativeButton("NOT OK", new DialogInterface.OnClickListener(){
+            public void onClick(DialogInterface arg0, int arg1) {
+                finish();
+            }
+        });
+        builder.show();
     }
 
 

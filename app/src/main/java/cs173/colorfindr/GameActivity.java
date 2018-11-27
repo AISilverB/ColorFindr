@@ -5,8 +5,11 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.ImageFormat;
+import android.graphics.Matrix;
+import android.graphics.Paint;
 import android.graphics.SurfaceTexture;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
@@ -21,6 +24,7 @@ import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.camera2.params.StreamConfigurationMap;
+import android.media.ExifInterface;
 import android.media.Image;
 import android.media.ImageReader;
 import android.os.Environment;
@@ -40,11 +44,13 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import org.w3c.dom.Text;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -147,14 +153,14 @@ public class GameActivity extends AppCompatActivity {
                 jpegSizes = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)
                         .getOutputSizes(ImageFormat.JPEG);
 
+            TextureView imagex = (TextureView) findViewById(R.id.textureView);
+
             //Capture image with custom size
-            int width = 640;
-            int height = 480;
-            if(jpegSizes != null && jpegSizes.length > 0)
-            {
-                width = jpegSizes[0].getWidth();
-                height = jpegSizes[0].getHeight();
-            }
+            logme("textw", imagex.getWidth());
+            logme("texth", imagex.getHeight());
+            int width = imagex.getWidth();
+            int height = imagex.getHeight();
+
             final ImageReader reader = ImageReader.newInstance(width,height,ImageFormat.JPEG,1);
             List<Surface> outputSurface = new ArrayList<>(2);
             outputSurface.add(reader.getSurface());
@@ -166,6 +172,7 @@ public class GameActivity extends AppCompatActivity {
 
             //Check orientation base on device
             int rotation = getWindowManager().getDefaultDisplay().getRotation();
+
             captureBuilder.set(CaptureRequest.JPEG_ORIENTATION,ORIENTATIONS.get(rotation));
 
             // file = new File(Environment.getExternalStorageDirectory()+"/"+UUID.randomUUID().toString()+".jpg");
@@ -180,13 +187,21 @@ public class GameActivity extends AppCompatActivity {
                         ByteBuffer buffer = image.getPlanes()[0].getBuffer();
                         byte[] bytes = new byte[buffer.capacity()];
                         buffer.get(bytes);
-                        Bitmap bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, null);
-                        //Initialize the intArray with the same size as the number of pixels on the image
-                        intArray = new int[bmp.getWidth() * bmp.getHeight()];
-                        bmp.getPixels(intArray, 0, bmp.getWidth(), 0, 0, bmp.getWidth(), bmp.getHeight());
 
-                        imageAnswer(intArray);
-                        // NOT TO SAVE THE FILE
+                        Bitmap bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, null);
+
+                        intArray = new int[bmp.getWidth() * bmp.getHeight()];
+                        int[] intArray2 = new int[50];
+                        //bmp.getPixels(intArray, 0, bmp.getWidth(), 0, 0, 50, 50);
+                        Log.d(TAG, Integer.toString(bmp.getWidth())+ " w-h " + Integer.toString(bmp.getHeight()));
+
+                        bmp = imageAnswer(bmp);
+
+                        // bitmap to save
+                        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                        bmp.compress(Bitmap.CompressFormat.JPEG, 100, bos);
+                        bytes = bos.toByteArray();
+
                         save(bytes);
                     }
                     catch (Exception e) {
@@ -258,9 +273,119 @@ public class GameActivity extends AppCompatActivity {
         boxtext.setText(ColorList[currctr]);
     }
 
-    private void imageAnswer(int[] intArray) {
+    private Bitmap imageAnswer(Bitmap imagea) {
         Log.d(TAG, "sakana = fish");
+        Log.d(TAG, Integer.toString(imagea.getHeight()) + " h-w" + Integer.toString(imagea.getWidth()));
+
+
+        int[] imgloc = new int[2];
+        TextureView imagex = (TextureView) findViewById(R.id.textureView);
+        imagex.getLocationOnScreen(imgloc);
+
+        logme("texture h", imagex.getHeight());
+        logme("texture w", imagex.getWidth());
+        // CREATE A MATRIX FOR THE MANIPULATION
+        Matrix matrix = new Matrix();
+        // RESIZE THE BIT MAP
+
+
+        // Create a bitmap of the same size
+        Bitmap pic = imagea;
+        Bitmap newBmp = Bitmap.createBitmap(pic.getWidth(), pic.getHeight(), Bitmap.Config.ARGB_8888);
+        // Create a canvas  for new bitmap
+        Canvas c = new Canvas(newBmp);
+        // Draw your old bitmap on it.
+        c.drawBitmap(pic, 0, 0, new Paint());
+        imagea = newBmp;
+
+
+        float scaleWidth = imagex.getWidth() / imagea.getWidth();
+        float scaleHeight = imagex.getHeight() / imagea.getHeight();
+        matrix.postScale(scaleWidth, scaleHeight);
+        // "RECREATE" THE NEW BITMAP
+        imagea  = Bitmap.createScaledBitmap(imagea, imagex.getWidth(), imagex.getHeight(), false);
+//        Bitmap resizedBitmap = Bitmap.createBitmap(
+//                imagea, 0, 0, imagex.getWidth(), imagex.getHeight(), matrix, false);
+//        imagea.recycle();
+//        imagea = resizedBitmap;
+//        Log.d(TAG, Integer.toString(resizedBitmap.getHeight()) + " h-w" + Integer.toString(resizedBitmap.getWidth()));
+
+        int[] boxloc = new int[2];
+        TextView boxtext = (TextView) findViewById(R.id.box_answer);
+        boxtext.getLocationOnScreen(boxloc);
+
+        Log.d(TAG, Integer.toString(imagea.getHeight()) + " h-w" + Integer.toString(imagea.getWidth()));
+
+
+//        float scalex = imagea.getScaledWidth(getResources().getDisplayMetrics())/imagex.getWidth();
+//        float scaley = imagea.getScaledHeight(getResources().getDisplayMetrics())/imagex.getHeight();
+
+
+        int scale = (imagea.getScaledHeight(getResources().getDisplayMetrics()) * imagea.getScaledWidth(getResources().getDisplayMetrics()))
+                / (imagex.getHeight() * imagex.getWidth());
+        logmef("scale", scale);
+//        logmef("scaley", scaley);
+        logmef("scaledDensity", getResources().getDisplayMetrics().scaledDensity);
+        logmef("densityDpi", getResources().getDisplayMetrics().densityDpi);
+        logmef("density", getResources().getDisplayMetrics().density);
+        logmef("xdpi", getResources().getDisplayMetrics().xdpi);
+        logmef("ydpi", getResources().getDisplayMetrics().ydpi);
+        logme("boxsize h", boxtext.getHeight());
+        logme("texture h", imagex.getHeight());
+        logme("texture w", imagex.getWidth());
+        logme("textloc x", imgloc[0]);
+        logme("textloc y", imgloc[1]);
+        logme("boxloc x", boxloc[0]);
+        logme("boxloc y", boxloc[1]);
+//        int offsetx = (int) ((boxloc[0]-imgloc[0])*scalex);
+//        int offsety = (int) ((boxloc[1]-imgloc[1])*scaley);
+
+        scale = (int) Math.sqrt(scale);
+        scale = 1;
+//        int offsetx = (int) ((imagea.getScaledWidth(getResources().getDisplayMetrics()) / 2) -
+//                ((boxtext.getWidth() / 2) * scale));
+//        int offsety = (int) ((imagea.getScaledHeight(getResources().getDisplayMetrics()) / 2) -
+//                        ((boxtext.getHeight() / 2) * scale));
+        int offsetx = boxloc[0] - imgloc[0];
+        int offsety = boxloc[1] - imgloc[1];
+
+                //        offsetx = (int) ((imagea.getScaledWidth(getResources().getDisplayMetrics()) / 2));
+//        offsety = (int) ((imagea.getScaledHeight(getResources().getDisplayMetrics()) / 2));
+//        Log.d(TAG, Integer.toString(offsetx)+"-"+ Integer.toString(offsety)+"  "+ Float.toString(offsetx+ boxtext.getHeight()*scalex) +"-"+  Float.toString(offsety + boxtext.getWidth()*scaley));
+
+
+        matrix = new Matrix();
+        matrix.postRotate(90);
+        Bitmap scaledBitmap = Bitmap.createScaledBitmap(imagea, imagea.getWidth(), imagea.getHeight(), true);
+        Bitmap rotatedBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
+        imagea = rotatedBitmap;
+
+        logme("OFFSETX: ", offsetx);
+        logme("OFFSETY: ", offsety);
+        for (int y = 0; y < boxtext.getHeight(); y++) {
+            for (int x = 0; x < boxtext.getWidth(); x++) {
+                int pv = imagea.getPixel(x + offsetx, y + offsety);
+                short red = (short) ((pv >> 16) & 0xFF);
+                short green = (short) ((pv >> 8) & 0xFF);
+                short blue = (short) ((pv >> 0) & 0xFF);
+                imagea.setPixel(x+offsetx, y+offsety, Color.RED);
+                Log.d(TAG, Integer.toString(offsetx+x) + "-" + Integer.toString(offsety+y)+ " = "
+                        + Integer.toString(red)+Integer.toString(green)+Integer.toString(blue));
+//      s          Log.d(TAG, Integer.toString(offsetx+x) + "-" + Integer.toString(offsety+y)+ " = "+Integer.toString(pixelvalues[y][x]));
+            }
+        }
+
+        return imagea;
     }
+
+    private void logme(String y, int x){
+        Log.d(TAG, y +": " + Integer.toString(x));
+    }
+
+    private void logmef(String y, float x){
+        Log.d(TAG, y +": " + Float.toString(x));
+    }
+
 
     private void createCameraPreview() {
         try{

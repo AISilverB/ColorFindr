@@ -48,6 +48,7 @@ import java.util.Random;
 
 public class GameActivity extends AppCompatActivity {
 
+    private Thread runnable;
     private String TAG = "GameActivity";
     private TextureView textureView;
     private String UnlockedColors[];
@@ -57,6 +58,7 @@ public class GameActivity extends AppCompatActivity {
     private int currscore;
     private int currlives;
     private int currhighscore;
+    private boolean change;
 
     //Check state orientation of output image
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
@@ -121,7 +123,8 @@ public class GameActivity extends AppCompatActivity {
         currhighscore = 0;
         currctr = -1;
         retrieveColorList();
-        changeColor();
+        change = true;
+        updateViews();
     }
 
     private void retrieveColorList(){
@@ -130,7 +133,9 @@ public class GameActivity extends AppCompatActivity {
        currctr = 0;
        UnlockedColors = new String[127];
     }
+
     private void takePicture() {
+
         if(cameraDevice == null)
             return;
         CameraManager manager = (CameraManager)getSystemService(Context.CAMERA_SERVICE);
@@ -147,6 +152,7 @@ public class GameActivity extends AppCompatActivity {
             TextureView imagex = findViewById(R.id.textureView);
 
             //Capture image with custom size
+            Log.d(TAG, "BUHAY: " + runnable.isAlive());
             logme("textw", imagex.getWidth());
             logme("texth", imagex.getHeight());
             int width = imagex.getWidth();
@@ -192,7 +198,6 @@ public class GameActivity extends AppCompatActivity {
                         }
                     }
                 }
-
             };
 
             reader.setOnImageAvailableListener(readerListener,mBackgroundHandler);
@@ -225,7 +230,37 @@ public class GameActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        changeColor();
+
+    }
+
+    private void updateViews (){
+        runnable = new Thread() {
+            @Override
+            public void run() {
+                while(true) {
+                    Log.d(TAG, "I AM A THREAD: " + change);
+                    if (change) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                changeColor();
+                            }
+                        });
+                        change = false;
+                    }
+
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+
+                        Log.d(TAG, "I AM A DIE THREAD: " + change);
+                    }
+                }
+            }
+        };
+
+        runnable.start();
     }
 
     @SuppressLint("ResourceType")
@@ -316,6 +351,8 @@ public class GameActivity extends AppCompatActivity {
         } else {
             currlives--;
         }
+
+        change = true;
     }
 
     private void logme(String y, int x){

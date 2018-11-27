@@ -6,16 +6,11 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.ImageFormat;
 import android.graphics.Matrix;
-import android.graphics.Paint;
 import android.graphics.SurfaceTexture;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
-import android.graphics.drawable.ShapeDrawable;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraCharacteristics;
@@ -25,10 +20,8 @@ import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.camera2.params.StreamConfigurationMap;
-import android.media.ExifInterface;
 import android.media.Image;
 import android.media.ImageReader;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.annotation.NonNull;
@@ -42,41 +35,29 @@ import android.util.SparseIntArray;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.w3c.dom.Text;
-
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.List;
-import java.util.UUID;
+import java.util.Random;
 
 public class GameActivity extends AppCompatActivity {
 
     private String TAG = "GameActivity";
-    private ImageButton btnCapture;
     private TextureView textureView;
-    private int intArray[];
-    private int UnlockedColors[];
+    private String UnlockedColors[];
     private String ColorList[];
     private int currctr;
     private String currcolor;
     private int currscore;
     private int currlives;
     private int currhighscore;
+
     //Check state orientation of output image
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
     static{
@@ -86,20 +67,14 @@ public class GameActivity extends AppCompatActivity {
         ORIENTATIONS.append(Surface.ROTATION_270,180);
     }
 
-    private String cameraId;
     private CameraDevice cameraDevice;
     private CameraCaptureSession cameraCaptureSessions;
     private CaptureRequest.Builder captureRequestBuilder;
     private Size imageDimension;
-    private ImageReader imageReader;
     private int level;
-    //Save to FILE
-    private File file;
     private static final int REQUEST_CAMERA_PERMISSION = 200;
-    private boolean mFlashSupported;
     private Handler mBackgroundHandler;
     private HandlerThread mBackgroundThread;
-    private Boolean answer;
 
     CameraDevice.StateCallback stateCallback = new CameraDevice.StateCallback() {
         @Override
@@ -116,7 +91,6 @@ public class GameActivity extends AppCompatActivity {
         @Override
         public void onError(@NonNull CameraDevice cameraDevice, int i) {
             cameraDevice.close();
-            cameraDevice=null;
         }
     };
 
@@ -127,11 +101,11 @@ public class GameActivity extends AppCompatActivity {
         setContentView(R.layout.activity_game);
         init();
 
-        textureView = (TextureView)findViewById(R.id.textureView);
+        textureView = findViewById(R.id.textureView);
         //From Java 1.4 , you can use keyword 'assert' to check expression true or false
         assert textureView != null;
         textureView.setSurfaceTextureListener(textureListener);
-        btnCapture = (ImageButton)findViewById(R.id.btnCapture);
+        ImageButton btnCapture = findViewById(R.id.btnCapture);
         btnCapture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -145,28 +119,32 @@ public class GameActivity extends AppCompatActivity {
         currscore = 0;
         currlives = 10;
         currhighscore = 0;
-
+        currctr = -1;
         retrieveColorList();
-        changeColor(currctr);
+        changeColor();
     }
 
     private void retrieveColorList(){
        ColorList = new String[127];
        ColorList = getResources().getStringArray(R.array.colorlist);
        currctr = 0;
+       UnlockedColors = new String[127];
     }
     private void takePicture() {
         if(cameraDevice == null)
             return;
         CameraManager manager = (CameraManager)getSystemService(Context.CAMERA_SERVICE);
         try{
-            CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraDevice.getId());
+            CameraCharacteristics characteristics = null;
+            if (manager != null) {
+                characteristics = manager.getCameraCharacteristics(cameraDevice.getId());
+            }
             Size[] jpegSizes = null;
             if(characteristics != null)
                 jpegSizes = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)
                         .getOutputSizes(ImageFormat.JPEG);
 
-            TextureView imagex = (TextureView) findViewById(R.id.textureView);
+            TextureView imagex = findViewById(R.id.textureView);
 
             //Capture image with custom size
             logme("textw", imagex.getWidth());
@@ -187,9 +165,6 @@ public class GameActivity extends AppCompatActivity {
             int rotation = getWindowManager().getDefaultDisplay().getRotation();
             captureBuilder.set(CaptureRequest.JPEG_ORIENTATION,ORIENTATIONS.get(rotation));
 
-            // file = new File(Environment.getExternalStorageDirectory()+"/"+UUID.randomUUID().toString()+".jpg");
-            file = new File(Environment.getExternalStorageDirectory()+"/img/"+Calendar.getInstance().getTime().toString()+".jpg");
-
             ImageReader.OnImageAvailableListener readerListener = new ImageReader.OnImageAvailableListener() {
                 @Override
                 public void onImageAvailable(ImageReader imageReader) {
@@ -201,22 +176,12 @@ public class GameActivity extends AppCompatActivity {
                         byte[] bytes = new byte[buffer.capacity()];
                         buffer.get(bytes);
 
-
                         Bitmap bm = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, null);
                         Matrix m = new Matrix();
                         m.postRotate(90);
                         Bitmap bmp = Bitmap.createBitmap(bm, 0, 0, bm.getWidth(), bm.getHeight(), m, true);
-
-//                        Log.d(TAG, Integer.toString(bmp.getWidth())+ " w-h " + Integer.toString(bmp.getHeight()));
-
                         imageAnswer(bmp);
-                        ////
-//                        // bitmap to save
-//                        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-//                        bmp.compress(Bitmap.CompressFormat.JPEG, 100, bos);
-//                        bytes = bos.toByteArray();
-//
-//                        save(bytes);
+
                     }
                     catch (Exception e) {
                         e.printStackTrace();
@@ -228,18 +193,6 @@ public class GameActivity extends AppCompatActivity {
                     }
                 }
 
-//                 NOT TO SAVE THE FILE
-                private void save(byte[] bytes) throws IOException {
-                    OutputStream outputStream = null;
-                    try{
-                        outputStream = new FileOutputStream(file);
-                        outputStream.write(bytes);
-                        Log.d(TAG, "file saved");
-                    }finally {
-                        if(outputStream != null)
-                            outputStream.close();
-                    }
-                }
             };
 
             reader.setOnImageAvailableListener(readerListener,mBackgroundHandler);
@@ -247,7 +200,6 @@ public class GameActivity extends AppCompatActivity {
                 @Override
                 public void onCaptureCompleted(@NonNull CameraCaptureSession session, @NonNull CaptureRequest request, @NonNull TotalCaptureResult result) {
                     super.onCaptureCompleted(session, request, result);
-                    //Toast.makeText(GameActivity.this, "Saved "+file, Toast.LENGTH_SHORT).show();
                     createCameraPreview();
                 }
             };
@@ -273,39 +225,50 @@ public class GameActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        currctr++;
-        changeColor(currctr);
+        changeColor();
     }
 
     @SuppressLint("ResourceType")
-    private void changeColor(int currctr) {
-        String colval = ColorList[currctr].replaceAll("[^A-Za-z0-9]", "");
-        EditText edit = (EditText) findViewById(R.id.curr_color_disp);
-        GradientDrawable gradientDrawable = (GradientDrawable) edit.getBackground().mutate();
-        Log.d(TAG, colval);
+    private void changeColor() {
 
+        Random rand = new Random();
+
+        int randomColor = rand.nextInt(ColorList.length);
+
+        while(!Arrays.asList(UnlockedColors).contains(UnlockedColors[randomColor])){
+            randomColor = rand.nextInt(ColorList.length);
+        }
+        currctr++;
+        UnlockedColors[currctr] = ColorList[randomColor];
+
+        EditText edit = findViewById(R.id.curr_color_disp);
+        GradientDrawable gradientDrawable = (GradientDrawable) edit.getBackground().mutate();
+
+
+        String colval = UnlockedColors[currctr].replaceAll("[^A-Za-z0-9]", "");
+        Log.d(TAG, colval);
         int objid = this.getResources().getIdentifier(colval, "color", this.getPackageName());
         gradientDrawable.setColor(ContextCompat.getColor(this, objid));
 
-        TextView boxtext = (TextView) findViewById(R.id.curr_color_name);
-        boxtext.setText(ColorList[currctr]);
+        TextView boxtext = findViewById(R.id.curr_color_name);
+        boxtext.setText(UnlockedColors[currctr]);
         currcolor = getResources().getString(objid).substring(2);
 
-        TextView scoretext = (TextView) findViewById(R.id.curr_score);
+        TextView scoretext = findViewById(R.id.curr_score);
         scoretext.setText(Integer.toString(currscore));
-        TextView livestext = (TextView) findViewById(R.id.curr_lives);
+        TextView livestext = findViewById(R.id.curr_lives);
         livestext.setText(Integer.toString(currlives));
-        TextView highscoretext = (TextView) findViewById(R.id.curr_high_score);
+        TextView highscoretext = findViewById(R.id.curr_high_score);
         highscoretext.setText(Integer.toString(currhighscore));
     }
 
     private void imageAnswer(Bitmap imagea) {
         int[] imgloc = new int[2];
-        TextureView imagex = (TextureView) findViewById(R.id.textureView);
+        TextureView imagex = findViewById(R.id.textureView);
         imagex.getLocationOnScreen(imgloc);
 
         int[] boxloc = new int[2];
-        TextView boxtext = (TextView) findViewById(R.id.box_answer);
+        TextView boxtext = findViewById(R.id.box_answer);
         boxtext.getLocationOnScreen(boxloc);
 
         int offsetx = boxloc[0] - imgloc[0];
@@ -315,23 +278,19 @@ public class GameActivity extends AppCompatActivity {
         int se = Integer.parseInt(currcolor.substring(3,5), 16);
         int th = Integer.parseInt(currcolor.substring(5, 7), 16);
 
-
-        int off = level;
         for (int y = 0; y < boxtext.getHeight(); y++) {
             for (int x = 0; x < boxtext.getWidth(); x++) {
                 int pv = imagea.getPixel(x + offsetx, y + offsety);
                 imagea.setPixel(x+offsetx, y+offsety, Color.RED);
 
 
-
                 short red = (short) ((pv >> 16) & 0xFF);
                 short green = (short) ((pv >> 8) & 0xFF);
-                short blue = (short) ((pv >> 0) & 0xFF);
+                short blue = (short) ((pv) & 0xFF);
 
-
-                if ( ((fi - off < red) && (fi + off > red)) &&
-                        ((se - off < green) && (se + off > green)) &&
-                            ((th - off < blue) && (th + off > blue)) ){
+                if ( ((fi - level < red) && (fi + level > red)) &&
+                        ((se - level < green) && (se + level > green)) &&
+                            ((th - level < blue) && (th + level > blue)) ){
 
                     Log.d(TAG, "GACHA");
 
@@ -340,13 +299,7 @@ public class GameActivity extends AppCompatActivity {
                             + Integer.toString(red)+Integer.toString(green)+Integer.toString(blue));
                     updateStats(true);
                     return;
-// return imagea;
                 }
-
-//                Log.d(TAG, Integer.toString(offsetx+x) + "-" + Integer.toString(offsety+y)
-//                        + currcolor.substring(1,2) + " = "
-//                        + Integer.toString(fi)+Integer.toString(se)+Integer.toString(th) + " - "
-//                        + Integer.toString(red)+Integer.toString(green)+Integer.toString(blue));
             }
         }
         updateStats(false);
@@ -369,9 +322,6 @@ public class GameActivity extends AppCompatActivity {
         Log.d(TAG, y +": " + Integer.toString(x));
     }
 
-    private void logmef(String y, float x){
-        Log.d(TAG, y +": " + Float.toString(x));
-    }
 
 
     private void createCameraPreview() {
@@ -416,8 +366,14 @@ public class GameActivity extends AppCompatActivity {
     private void openCamera() {
         CameraManager manager = (CameraManager)getSystemService(Context.CAMERA_SERVICE);
         try{
-            cameraId = manager.getCameraIdList()[0];
-            CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
+            String cameraId = null;
+            if (manager != null) {
+                cameraId = manager.getCameraIdList()[0];
+            }
+            CameraCharacteristics characteristics = null;
+            if (cameraId != null) {
+                characteristics = manager.getCameraCharacteristics(cameraId);
+            }
             StreamConfigurationMap map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
             assert map != null;
             imageDimension = map.getOutputSizes(SurfaceTexture.class)[0];
